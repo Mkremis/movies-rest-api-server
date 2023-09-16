@@ -1,57 +1,48 @@
-import { readJson } from '../utils/movies.js';
-const movies = readJson('../movies.json');
-import { randomUUID } from 'node:crypto';
+import { MovieModel } from '../models/movie.js';
 import { validateMovie, validatePartialMovie } from '../schemas/movies.js';
 
-export const getMovies = (genre) => {
-  if (genre) {
-    const Genre = genre.charAt(0).toUpperCase() + genre.slice(1);
-    const result = movies.filter((movie) => movie.genre.includes(Genre));
-    if (result.length) return result;
-    return null;
-  } else {
-    return movies;
+export class MovieController {
+  static async getAll(req, res) {
+    const { genre } = req.query;
+    const result = await MovieModel.getAll({ genre });
+    res.json(result);
   }
-};
 
-export const getMovie = (id) => {
-  const movie = movies.filter((movie) => movie.id === id);
-  if (movie.length) return movie;
-  return null;
-};
-
-export const createMovie = async (data) => {
-  const result = validateMovie(data);
-  if (!result.success) return result.error;
-  const newMovie = { ...result.data, id: randomUUID() };
-  try {
-    movies.push(newMovie);
-    writeFileSync('./movies.json', JSON.stringify(movies));
-    return { success: newMovie };
-  } catch (error) {
-    return { error: error.message };
+  static async getById(req, res) {
+    const { id } = req.params;
+    const result = await MovieModel.getById({ id });
+    if (!result) return res.status(404).json({ message: 'Movie not found' });
+    return res.json(result);
   }
-};
 
-export const updateMovie = async (id) => {
-  const movieIndex = movies.findIndex((movie) => movie.id === id);
-  if (movieIndex < 0) return { error: 'Movie not found' };
-  const result = validatePartialMovie(req.body);
-  if (!result.success) return { error: result.error };
-  const updatedMovie = { ...movies[movieIndex], ...result.data };
-  movies[movieIndex] = updatedMovie;
-  try {
-    writeFileSync('./movies.json', JSON.stringify(movies));
-    return { success: movies[movieIndex] };
-  } catch (error) {
-    return { error: error.message };
+  static async create(req, res) {
+    const result = validateMovie(req.body);
+    if (!result.success) {
+      return res.status(400).json({ error: JSON.parse(result.error.message) });
+    }
+    const response = await MovieModel.create({ input: result.data });
+    if (response.error) {
+      return res.status(400).json({ error: response.error });
+    }
+    return res.status(200).json({ message: response.success });
   }
-};
 
-export const deleteMovie = (id) => {
-  const movieIndex = movies.findIndex((movie) => movie.id === id);
-  if (movieIndex < 0) return { error: 'Movie Not Found' };
-  movies.splice(movieIndex, 1);
-  writeFileSync('./movies.json', JSON.stringify(movies));
-  return { success: 'Movie deleted' };
-};
+  static async delete(req, res) {
+    const { id } = req.params;
+    const result = await MovieModel.delete({ id });
+    if (result.error) return res.status(404).json({ error: result.error });
+    return res.json({ message: result.success });
+  }
+
+  static async update(req, res) {
+    const { id } = req.params;
+    const result = validatePartialMovie(req.body);
+    if (!result.success) {
+      return { error: JSON.parse(result.error.message) };
+    }
+    const response = await MovieModel.update({ id, input: result.data });
+    if (response.success)
+      return res.status(400).json({ error: response.error });
+    return res.status(200).json({ message: response.success });
+  }
+}

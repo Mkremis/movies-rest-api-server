@@ -1,4 +1,4 @@
-import { readJson } from '../utils/movies.js';
+import { readJson } from '../../utils/movies.js';
 const movies = readJson('../movies.json');
 
 import { randomUUID } from 'node:crypto';

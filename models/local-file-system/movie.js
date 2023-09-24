@@ -1,7 +1,7 @@
-import { readJson } from '../../utils/movies.js';
-const movies = readJson('../movies.json');
+import { readJson } from "../../utils/movies.js";
+const movies = readJson("../movies.json");
 
-import { randomUUID } from 'node:crypto';
+import { randomUUID } from "node:crypto";
 
 export class MovieModel {
   static async getAll({ genre }) {
@@ -26,7 +26,7 @@ export class MovieModel {
     const newMovie = { id: randomUUID(), ...input };
     try {
       movies.push(newMovie);
-      writeFileSync('./movies.json', JSON.stringify(movies));
+      writeFileSync("./movies.json", JSON.stringify(movies));
       return { success: newMovie };
     } catch (error) {
       return { error: error.message };
@@ -35,19 +35,19 @@ export class MovieModel {
 
   static async delete({ id }) {
     const movieIndex = movies.findIndex((movie) => movie.id === id);
-    if (movieIndex < 0) return { error: 'Movie Not Found' };
+    if (movieIndex < 0) return { error: "Movie Not Found" };
     movies.splice(movieIndex, 1);
-    writeFileSync('./movies.json', JSON.stringify(movies));
-    return { success: 'Movie deleted' };
+    writeFileSync("./movies.json", JSON.stringify(movies));
+    return { success: "Movie deleted" };
   }
 
   static async update({ id, input }) {
     const movieIndex = movies.findIndex((movie) => movie.id === id);
-    if (movieIndex < 0) return { error: 'Movie not found' };
+    if (movieIndex < 0) return { error: "Movie not found" };
     const updatedMovie = { ...movies[movieIndex], ...input };
     movies[movieIndex] = updatedMovie;
     try {
-      writeFileSync('./movies.json', JSON.stringify(movies));
+      writeFileSync("./movies.json", JSON.stringify(movies));
       return { success: movies[movieIndex] };
     } catch (error) {
       return { error: error.message };

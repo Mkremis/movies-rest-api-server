@@ -1,7 +1,7 @@
 const ACCEPTED_ORIGINS = [
-  'http://localhost:8080',
-  'https://movies.com',
-  'https://localhost:3000',
+  "http://localhost:8080",
+  "https://movies.com",
+  "https://localhost:3000",
 ];
 
 export const corsMiddleware =
@@ -10,10 +10,9 @@ export const corsMiddleware =
     // CORS:
     // res.header('Access-Control-Allow-Origin', '*');
     // res.header('Access-Control-Allow-Origin', 'http://localhost:8080');
-    console.log(acceptedOrigin);
-    const origin = req.header('origin');
+    const origin = req.header("origin");
     if (acceptedOrigin.includes(origin) || !origin) {
-      res.header('Access-Control-Allow-Origin', origin);
+      res.header("Access-Control-Allow-Origin", origin);
       next();
     }
   };

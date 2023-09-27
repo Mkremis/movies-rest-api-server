@@ -16,6 +16,7 @@ const movieSchema = z.object({
       "Adventure",
       "Adult",
       "Animation",
+      "Biography",
       "Comedy",
       "Crime",
       "Documentary",

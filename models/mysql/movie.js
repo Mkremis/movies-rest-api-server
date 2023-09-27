@@ -1,12 +1,15 @@
 import mysql from "mysql2/promise";
+import "dotenv/config";
 
-const pool = mysql.createPool({
+const defaultConfig = {
   host: "localhost",
   user: "root",
   password: "1234",
   port: 3306,
   database: "moviesdb",
-});
+};
+
+const pool = mysql.createPool(process.env.DATABASE_URL || defaultConfig);
 
 export class MovieModel {
   static async getAll({ genre }) {
@@ -46,7 +49,7 @@ export class MovieModel {
 
       const [movies] = await pool.query(query, [lowerCaseGenre]);
 
-      if (!movies.length) {
+      if (genre && !movies.length) {
         return { message: `There are no movies with genre '${genre}'` };
       }
 
